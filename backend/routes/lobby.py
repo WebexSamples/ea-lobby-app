@@ -5,7 +5,14 @@ import uuid
 lobby_bp = Blueprint('lobby_bp', __name__)
 
 # In-memory store for lobbies.
-# Structure: { lobby_id: { 'host': 'host_id', 'lobby_name': 'name', 'participants': [user_ids] } }
+# Structure:
+# {
+#   lobby_id: {
+#       'host': <host_user_id>,
+#       'lobby_name': <name>,
+#       'participants': [ { 'id': <uuid>, 'display_name': <name>, 'ready': <bool> }, ... ]
+#   }
+# }
 lobbies = {}
 
 @lobby_bp.route('/lobby', methods=['POST'])
@@ -19,12 +26,12 @@ def create_lobby():
         return jsonify({'error': 'host_id is required'}), 400
     
     lobby_id = str(uuid.uuid4())
+    # Store the host as a participant with ready state defaulted to False
     lobbies[lobby_id] = {
         'host': host_id,
         'lobby_name': lobby_name,
-        'participants': [host_id]
+        'participants': [{'id': host_id, 'display_name': data.get('host_display_name', 'Host'), 'ready': False}]
     }
-    # Update lobby_url as needed
     lobby_url = f"http://localhost:5000/lobby/{lobby_id}"
     return jsonify({'lobby_id': lobby_id, 'lobby_url': lobby_url, 'lobby_name': lobby_name}), 201
 
