@@ -1,6 +1,7 @@
 # backend/app.py
 from flask import Flask
 from flask_socketio import SocketIO, join_room, leave_room, emit
+from flask_cors import CORS  # Import Flask-CORS
 from config import Config
 from routes.lobby import lobby_bp, get_lobbies
 
@@ -9,6 +10,9 @@ app.config.from_object(Config)
 
 # Initialize SocketIO with eventlet support.
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
+
+# Enable CORS for all routes
+CORS(app)
 
 # Register our lobby API routes under the '/api' prefix.
 app.register_blueprint(lobby_bp, url_prefix='/api')
