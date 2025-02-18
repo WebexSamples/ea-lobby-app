@@ -2,13 +2,13 @@
 from flask import Flask
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from config import Config
-from routes.lobby import lobby_bp
-from sockets.lobby import register_lobby_socket_handlers
+from .config import Config
+from .routes.lobby import lobby_bp
+from .sockets.lobby import register_lobby_socket_handlers  # Import our lobby socket handlers
 
 app = Flask(__name__)
 app.config.from_object(Config)
-CORS(app)  # Enable CORS
+CORS(app)
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 

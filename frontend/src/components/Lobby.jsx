@@ -4,6 +4,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { SOCKET_EVENTS } from '../constants';
 
 const socket = io('http://localhost:5000'); // Adjust URL if needed
 
@@ -23,7 +24,7 @@ const Lobby = () => {
       setUser(location.state.user);
       setDisplayName(location.state.user.display_name);
       setJoined(true);
-      socket.emit('join_lobby', { lobby_id: lobbyId, user: location.state.user });
+      socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: location.state.user });
       axios
         .get(`http://localhost:5000/api/lobby/${lobbyId}`)
         .then((response) => setLobby(response.data))
@@ -37,13 +38,13 @@ const Lobby = () => {
   // Listen for lobby updates only after joining
   useEffect(() => {
     if (joined) {
-      socket.on('lobby_update', (data) => {
+      socket.on(SOCKET_EVENTS.LOBBY_UPDATE, (data) => {
         setLobby(data);
       });
     }
     return () => {
       if (joined) {
-        socket.off('lobby_update');
+        socket.off(SOCKET_EVENTS.LOBBY_UPDATE);
       }
     };
   }, [joined]);
@@ -58,7 +59,7 @@ const Lobby = () => {
     const userId = uuidv4();
     const userObj = { id: userId, display_name: displayName };
     setUser(userObj);
-    socket.emit('join_lobby', { lobby_id: lobbyId, user: userObj });
+    socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: userObj });
     setJoined(true);
     axios
       .get(`http://localhost:5000/api/lobby/${lobbyId}`)
@@ -72,7 +73,7 @@ const Lobby = () => {
   // Handle leaving the lobby (stay on the same page)
   const handleLeave = () => {
     if (user) {
-      socket.emit('leave_lobby', { lobby_id: lobbyId, user_id: user.id });
+      socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, { lobby_id: lobbyId, user_id: user.id });
       setJoined(false);
       // Optionally, clear lobby info or let it persist
     }
@@ -85,7 +86,7 @@ const Lobby = () => {
       return;
     }
     if (user) {
-      socket.emit('update_display_name', {
+      socket.emit(SOCKET_EVENTS.LOBBY_UPDATE_DISPLAY_NAME, {
         lobby_id: lobbyId,
         user_id: user.id,
         new_display_name: newDisplayName,
@@ -98,7 +99,7 @@ const Lobby = () => {
   // Handle toggling ready status
   const handleToggleReady = () => {
     if (user) {
-      socket.emit('toggle_ready', { lobby_id: lobbyId, user_id: user.id });
+      socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, { lobby_id: lobbyId, user_id: user.id });
     }
   };
 
