@@ -12,12 +12,14 @@ const Lobby = () => {
   const [username, setUsername] = useState('');
   const [joined, setJoined] = useState(false);
 
+  // Listen for lobby updates only after joining
   useEffect(() => {
     if (joined) {
       socket.on('lobby_update', (data) => {
         setLobby(data);
       });
     }
+    // Cleanup when the component unmounts or if joined changes
     return () => {
       if (joined) {
         socket.off('lobby_update');
@@ -25,6 +27,7 @@ const Lobby = () => {
     };
   }, [joined]);
 
+  // Handle join lobby
   const handleJoin = () => {
     if (!username.trim()) {
       alert('Please enter a username.');
@@ -40,6 +43,15 @@ const Lobby = () => {
       });
   };
 
+  // Handle leave lobby
+  const handleLeave = () => {
+    socket.emit('leave_lobby', { lobby_id: lobbyId, user_id: username });
+    // Optionally, reset local state or cleanup as needed
+    setLobby(null);
+    setJoined(false);
+  };
+
+  // Before joining, display the join form
   if (!joined) {
     return (
       <div style={{ textAlign: 'center', marginTop: '2rem' }}>
@@ -63,6 +75,7 @@ const Lobby = () => {
 
   if (!lobby) return <div style={{ textAlign: 'center', marginTop: '2rem' }}>Loading lobby...</div>;
 
+  // After joining, display lobby details and a "Leave Lobby" button
   return (
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Lobby Name: {lobby.lobby_name}</h2>
@@ -73,6 +86,12 @@ const Lobby = () => {
           <li key={index}>{participant}</li>
         ))}
       </ul>
+      <button 
+        onClick={handleLeave}
+        style={{ padding: '0.5rem 1rem', fontSize: '1rem', marginTop: '1rem' }}
+      >
+        Leave Lobby
+      </button>
     </div>
   );
 };
