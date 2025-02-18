@@ -47,5 +47,29 @@ def handle_leave_lobby(data):
         lobbies[lobby_id]['participants'].remove(user_id)
         emit('lobby_update', lobbies[lobby_id], room=lobby_id)
 
+@socketio.on('update_username')
+def handle_update_username(data):
+    lobby_id = data.get('lobby_id')
+    old_user_id = data.get('old_user_id')
+    new_user_id = data.get('new_user_id')
+    
+    lobbies = get_lobbies()  # Using the in-memory lobby store
+    if lobby_id not in lobbies:
+        emit('error', {'message': 'Lobby not found'})
+        return
+    
+    # Update the participant list if the old username exists
+    participants = lobbies[lobby_id]['participants']
+    if old_user_id in participants:
+        index = participants.index(old_user_id)
+        participants[index] = new_user_id
+        # If the host is changing their name, update the host field as well
+        if lobbies[lobby_id]['host'] == old_user_id:
+            lobbies[lobby_id]['host'] = new_user_id
+        emit('lobby_update', lobbies[lobby_id], room=lobby_id)
+    else:
+        emit('error', {'message': 'User not found in lobby'})
+
+
 if __name__ == '__main__':
     socketio.run(app, debug=True)

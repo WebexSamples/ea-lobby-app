@@ -1,15 +1,17 @@
 // src/components/Lobby.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import axios from 'axios';
 
-const socket = io('http://localhost:5000'); // Ensure URL matches your backend
+const socket = io('http://localhost:5000'); // Adjust URL if needed
 
 const Lobby = () => {
   const { lobbyId } = useParams();
+  const navigate = useNavigate();
   const [lobby, setLobby] = useState(null);
   const [username, setUsername] = useState('');
+  const [newUsername, setNewUsername] = useState('');
   const [joined, setJoined] = useState(false);
 
   // Listen for lobby updates only after joining
@@ -19,7 +21,7 @@ const Lobby = () => {
         setLobby(data);
       });
     }
-    // Cleanup when the component unmounts or if joined changes
+    // Cleanup on component unmount or when joined changes
     return () => {
       if (joined) {
         socket.off('lobby_update');
@@ -27,7 +29,7 @@ const Lobby = () => {
     };
   }, [joined]);
 
-  // Handle join lobby
+  // Handle join lobby event
   const handleJoin = () => {
     if (!username.trim()) {
       alert('Please enter a username.');
@@ -43,12 +45,28 @@ const Lobby = () => {
       });
   };
 
-  // Handle leave lobby
+  // Handle leaving the lobby
   const handleLeave = () => {
     socket.emit('leave_lobby', { lobby_id: lobbyId, user_id: username });
-    // Optionally, reset local state or cleanup as needed
     setLobby(null);
     setJoined(false);
+    navigate('/create-lobby');
+  };
+
+  // Handle updating the username
+  const handleUpdateUsername = () => {
+    if (!newUsername.trim()) {
+      alert('Please enter a new username.');
+      return;
+    }
+    socket.emit('update_username', { 
+      lobby_id: lobbyId, 
+      old_user_id: username, 
+      new_user_id: newUsername 
+    });
+    // Update the local username state
+    setUsername(newUsername);
+    setNewUsername('');
   };
 
   // Before joining, display the join form
@@ -75,7 +93,7 @@ const Lobby = () => {
 
   if (!lobby) return <div style={{ textAlign: 'center', marginTop: '2rem' }}>Loading lobby...</div>;
 
-  // After joining, display lobby details and a "Leave Lobby" button
+  // Once joined, display the lobby details along with options to update the username or leave
   return (
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Lobby Name: {lobby.lobby_name}</h2>
@@ -86,6 +104,21 @@ const Lobby = () => {
           <li key={index}>{participant}</li>
         ))}
       </ul>
+      <div style={{ marginTop: '1rem' }}>
+        <input
+          type="text"
+          placeholder="Enter new username"
+          value={newUsername}
+          onChange={(e) => setNewUsername(e.target.value)}
+          style={{ padding: '0.5rem', fontSize: '1rem' }}
+        />
+        <button
+          onClick={handleUpdateUsername}
+          style={{ padding: '0.5rem 1rem', marginLeft: '1rem', fontSize: '1rem' }}
+        >
+          Update Name
+        </button>
+      </div>
       <button 
         onClick={handleLeave}
         style={{ padding: '0.5rem 1rem', fontSize: '1rem', marginTop: '1rem' }}
