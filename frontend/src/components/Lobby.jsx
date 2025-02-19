@@ -136,6 +136,16 @@ const Lobby = () => {
     );
   }
 
+  const handleSetShareURL = async () => {
+    if (webexData) {
+      try {
+        await webexData.app.setShareUrl(lobbyUrl, lobbyUrl, 'Lobby');  
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
   if (!lobby) {
     return <div style={{ textAlign: 'center', marginTop: '2rem' }}>Loading lobby...</div>;
   }
@@ -145,7 +155,10 @@ const Lobby = () => {
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Lobby Name: {lobby.lobby_name}</h2>
       <h3>Lobby ID: {lobbyId}</h3>
-      <h3>Lobby URL: { lobbyUrl }</h3>
+      <h3>Lobby URL: <a href={lobbyUrl}>{ lobbyUrl }</a></h3>
+      <button disabled={!webexData} onClick={handleSetShareURL} style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}>
+        Open Lobby
+      </button>
       <h3>Your Display Name: {user && user.display_name}</h3>
       <h3>Participants:</h3>
       <ul style={{ listStyle: 'none', padding: 0 }}>
