@@ -6,7 +6,7 @@ import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { SOCKET_EVENTS } from '../constants';
 
-const socket = io('http://localhost:5000'); // Adjust URL if needed
+const socket = io(import.meta.env.VITE_SOCKET_URL); // Adjust URL if needed
 
 const Lobby = () => {
   const { lobbyId } = useParams();
@@ -26,7 +26,7 @@ const Lobby = () => {
       setJoined(true);
       socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: location.state.user });
       axios
-        .get(`http://localhost:5000/api/lobby/${lobbyId}`)
+        .get(`${import.meta.env.VITE_API_URL}/lobby/${lobbyId}`)
         .then((response) => setLobby(response.data))
         .catch((error) => {
           console.error('Error fetching lobby:', error);
@@ -62,7 +62,7 @@ const Lobby = () => {
     socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: userObj });
     setJoined(true);
     axios
-      .get(`http://localhost:5000/api/lobby/${lobbyId}`)
+      .get(`${import.meta.env.VITE_API_URL}/lobby/${lobbyId}`)
       .then((response) => setLobby(response.data))
       .catch((error) => {
         console.error('Error fetching lobby:', error);

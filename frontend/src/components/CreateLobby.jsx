@@ -17,7 +17,7 @@ const CreateLobby = () => {
     // Generate a UUID for the host user
     const hostId = uuidv4();
     try {
-      const response = await axios.post('http://localhost:5000/api/lobby', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/lobby`, {
         host_id: hostId,
         host_display_name: displayName,
         lobby_name: lobbyName,

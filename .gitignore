@@ -8,3 +8,13 @@ __pycache__/
 
 # pyenv
 venv/
+
+# Certificate authority
+*.pem
+
+# environments
+.env.development
+.env.production
+
+# nginx config
+lobby.local.conf
