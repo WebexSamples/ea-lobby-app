@@ -5,6 +5,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { SOCKET_EVENTS } from '../constants';
+import useWebex from '../hooks/useWebex';
 
 const socket = io(import.meta.env.VITE_SOCKET_URL); // Adjust URL if needed
 
@@ -15,8 +16,11 @@ const Lobby = () => {
   const [displayName, setDisplayName] = useState('');
   const [newDisplayName, setNewDisplayName] = useState('');
   const [joined, setJoined] = useState(false);
+  const [lobbyUrl, setLobbyUrl] = useState('');
   // User object: { id: uuid, display_name: string }
   const [user, setUser] = useState(null);
+
+  const { webexData } = useWebex();
 
   // If the user object is passed from CreateLobby, use it to auto-join
   useEffect(() => {
@@ -24,6 +28,7 @@ const Lobby = () => {
       setUser(location.state.user);
       setDisplayName(location.state.user.display_name);
       setJoined(true);
+      setLobbyUrl(`${window.location.origin}/lobby/${lobbyId}`);
       socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: location.state.user });
       axios
         .get(`${import.meta.env.VITE_API_URL}/lobby/${lobbyId}`)
@@ -34,6 +39,12 @@ const Lobby = () => {
         });
     }
   }, [location.state, lobbyId, user]);
+
+  useEffect(() => {
+    if (webexData) {
+      setDisplayName(webexData.user.displayName);
+    }
+  }, [webexData]);
 
   // Listen for lobby updates only after joining
   useEffect(() => {
@@ -134,6 +145,7 @@ const Lobby = () => {
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Lobby Name: {lobby.lobby_name}</h2>
       <h3>Lobby ID: {lobbyId}</h3>
+      <h3>Lobby URL: { lobbyUrl }</h3>
       <h3>Your Display Name: {user && user.display_name}</h3>
       <h3>Participants:</h3>
       <ul style={{ listStyle: 'none', padding: 0 }}>

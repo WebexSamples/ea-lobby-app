@@ -1,13 +1,22 @@
 // src/components/CreateLobby.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import useWebex from '../hooks/useWebex';
 
 const CreateLobby = () => {
   const navigate = useNavigate();
   const [lobbyName, setLobbyName] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const { webexData, loading } = useWebex();
+
+  useEffect(() => {
+    if(webexData) {
+      setLobbyName(webexData.meeting.title);
+      setDisplayName(webexData.user.displayName);
+    }
+  }, [webexData]);
 
   const handleCreateLobby = async () => {
     if (!lobbyName.trim() || !displayName.trim()) {
@@ -32,8 +41,13 @@ const CreateLobby = () => {
       alert('Failed to create lobby. Please check the console for details.');
     }
   };
+  
+  if (loading) {
+    return <p>Loading Webex data...</p>;
+  }
 
   return (
+    
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Create a Lobby</h2>
       <input
