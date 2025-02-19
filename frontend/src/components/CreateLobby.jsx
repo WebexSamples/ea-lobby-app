@@ -41,15 +41,12 @@ const CreateLobby = () => {
       alert('Failed to create lobby. Please check the console for details.');
     }
   };
-  
-  if (loading) {
-    return <p>Loading Webex data...</p>;
-  }
 
   return (
     
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Create a Lobby</h2>
+      {loading && <p>Loading Webex...</p>}
       <input
         type="text"
         placeholder="Lobby Name"
