@@ -12,7 +12,7 @@ const CreateLobby = () => {
   const { webexData, loading } = useWebex();
 
   useEffect(() => {
-    if(webexData) {
+    if (webexData) {
       setLobbyName(webexData.meeting.title);
       setDisplayName(webexData.user.displayName);
     }
@@ -26,11 +26,14 @@ const CreateLobby = () => {
     // Generate a UUID for the host user
     const hostId = uuidv4();
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/lobby`, {
-        host_id: hostId,
-        host_display_name: displayName,
-        lobby_name: lobbyName,
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/lobby`,
+        {
+          host_id: hostId,
+          host_display_name: displayName,
+          lobby_name: lobbyName,
+        },
+      );
       const { lobby_id } = response.data;
       // Navigate to the lobby page, passing the host's user object in location state
       navigate(`/lobby/${lobby_id}`, {
@@ -43,7 +46,6 @@ const CreateLobby = () => {
   };
 
   return (
-    
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Create a Lobby</h2>
       {loading && <p>Loading Webex...</p>}
@@ -61,7 +63,10 @@ const CreateLobby = () => {
         onChange={(e) => setDisplayName(e.target.value)}
         style={{ padding: '0.5rem', fontSize: '1rem', marginRight: '1rem' }}
       />
-      <button onClick={handleCreateLobby} style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}>
+      <button
+        onClick={handleCreateLobby}
+        style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}
+      >
         Create Lobby
       </button>
     </div>

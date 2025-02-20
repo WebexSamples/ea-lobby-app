@@ -29,7 +29,10 @@ const Lobby = () => {
       setDisplayName(location.state.user.display_name);
       setJoined(true);
       setLobbyUrl(`${window.location.origin}/lobby/${lobbyId}`);
-      socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: location.state.user });
+      socket.emit(SOCKET_EVENTS.LOBBY_JOIN, {
+        lobby_id: lobbyId,
+        user: location.state.user,
+      });
       axios
         .get(`${import.meta.env.VITE_API_URL}/lobby/${lobbyId}`)
         .then((response) => setLobby(response.data))
@@ -84,7 +87,10 @@ const Lobby = () => {
   // Handle leaving the lobby (stay on the same page)
   const handleLeave = () => {
     if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, { lobby_id: lobbyId, user_id: user.id });
+      socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, {
+        lobby_id: lobbyId,
+        user_id: user.id,
+      });
       setJoined(false);
       // Optionally, clear lobby info or let it persist
     }
@@ -110,7 +116,10 @@ const Lobby = () => {
   // Handle toggling ready status
   const handleToggleReady = () => {
     if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, { lobby_id: lobbyId, user_id: user.id });
+      socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, {
+        lobby_id: lobbyId,
+        user_id: user.id,
+      });
     }
   };
 
@@ -128,7 +137,11 @@ const Lobby = () => {
         />
         <button
           onClick={handleJoin}
-          style={{ padding: '0.5rem 1rem', marginLeft: '1rem', fontSize: '1rem' }}
+          style={{
+            padding: '0.5rem 1rem',
+            marginLeft: '1rem',
+            fontSize: '1rem',
+          }}
         >
           Join Lobby
         </button>
@@ -139,15 +152,19 @@ const Lobby = () => {
   const handleSetShareURL = async () => {
     if (webexData) {
       try {
-        await webexData.app.setShareUrl(lobbyUrl, lobbyUrl, 'Lobby');  
+        await webexData.app.setShareUrl(lobbyUrl, lobbyUrl, 'Lobby');
       } catch (error) {
         console.error(error);
       }
     }
-  }
+  };
 
   if (!lobby) {
-    return <div style={{ textAlign: 'center', marginTop: '2rem' }}>Loading lobby...</div>;
+    return (
+      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+        Loading lobby...
+      </div>
+    );
   }
 
   // Display lobby details and controls for joined users
@@ -155,8 +172,14 @@ const Lobby = () => {
     <div style={{ textAlign: 'center', marginTop: '2rem' }}>
       <h2>Lobby Name: {lobby.lobby_name}</h2>
       <h3>Lobby ID: {lobbyId}</h3>
-      <h3>Lobby URL: <a href={lobbyUrl}>{ lobbyUrl }</a></h3>
-      <button disabled={!webexData} onClick={handleSetShareURL} style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}>
+      <h3>
+        Lobby URL: <a href={lobbyUrl}>{lobbyUrl}</a>
+      </h3>
+      <button
+        disabled={!webexData}
+        onClick={handleSetShareURL}
+        style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}
+      >
         Open Lobby
       </button>
       <h3>Your Display Name: {user && user.display_name}</h3>
@@ -164,14 +187,19 @@ const Lobby = () => {
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {lobby.participants.map((participant, index) => (
           <li key={index}>
-            {participant.display_name} ({participant.ready ? 'Ready' : 'Not Ready'})
+            {participant.display_name} (
+            {participant.ready ? 'Ready' : 'Not Ready'})
           </li>
         ))}
       </ul>
       <div style={{ marginTop: '1rem' }}>
         <button
           onClick={handleToggleReady}
-          style={{ padding: '0.5rem 1rem', fontSize: '1rem', marginRight: '1rem' }}
+          style={{
+            padding: '0.5rem 1rem',
+            fontSize: '1rem',
+            marginRight: '1rem',
+          }}
         >
           Toggle Ready
         </button>
@@ -184,7 +212,11 @@ const Lobby = () => {
         />
         <button
           onClick={handleUpdateDisplayName}
-          style={{ padding: '0.5rem 1rem', marginLeft: '1rem', fontSize: '1rem' }}
+          style={{
+            padding: '0.5rem 1rem',
+            marginLeft: '1rem',
+            fontSize: '1rem',
+          }}
         >
           Update Name
         </button>
