@@ -18,11 +18,11 @@ const useWebex = () => {
         const meeting = await app.context.getMeeting();
         const user = app.application.states.user;
         const context = {
-            app,
-            about: app.about,
-            meeting,
-            user
-        }
+          app,
+          about: app.about,
+          meeting,
+          user,
+        };
         setWebexData(context);
       } catch (err) {
         console.error('Error fetching Webex data:', err);
