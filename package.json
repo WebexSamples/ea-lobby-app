@@ -1,5 +1,9 @@
 {
-  "name": "webex-samples-github-template",
+  "name": "ea-lobby-app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WebexSamples/ea-lobby-app.git"
+  },
   "version": "0.1.0",
   "private": true,
   "type": "module",

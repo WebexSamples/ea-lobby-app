@@ -1,6 +1,6 @@
-# Multi-User Pregame Lobby
+# Multi-User Lobby Webex Embedded App 
 
-A sample project demonstrating a multi-user pregame lobby system built with a Flask backend and a React frontend (using Vite). The backend leverages Flask-SocketIO for real-time communication, while the frontend uses Socket.IO to interact with the backend. The project features include lobby creation, user join/leave, display name updates, and a "Ready" status toggle—all organized into modular components.
+A sample project demonstrating a multi-user lobby system built with a Flask backend and a React frontend (using Vite). The backend leverages Flask-SocketIO for real-time communication, while the frontend uses Socket.IO to interact with the backend. The project features include lobby creation, user join/leave, display name updates, and a "Ready" status toggle—all organized into modular components. The project is built to be integrated with Webex Embedded Apps to provide a seamless real-time experience within Webex Meetings.
 
 ## Features
 
@@ -45,6 +45,18 @@ multi-user-pregame-lobby/
         ├── main.jsx        # React entry point
         └── constants.js    # Socket event constants for the frontend
 ```
+
+
+## Using with Webex Embedded Apps
+
+This project can be integrated with Webex Embedded Apps to enhance the user experience within Webex. For more information on how to use Webex Embedded Apps, refer to the following documentation:
+
+- [Webex Embedded Apps Documentation](https://developer.webex.com/docs/embedded-apps)
+- [Webex Embedded Apps SDK Documentation](https://eaf-sdk.webex.com/)
+
+By integrating with Webex Embedded Apps, you can leverage the capabilities of Webex to provide a seamless and interactive experience for users within the Webex environment.
+
+In this application, we use the Webex Embedded Apps SDK to interact with the Webex platform and provide a more integrated experience for users. The SDK allows us to get the current meeting's title and use it as the lobby name when creating a new lobby. We also use the SDK to get the current user's display name and use it as the default display name when joining a lobby.
 
 ## Installation
 
