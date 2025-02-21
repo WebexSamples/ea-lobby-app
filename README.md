@@ -1,5 +1,7 @@
 # Multi-User Webex Embedded App Launch Pad
 
+![Launch Pad Image](image.png)
+
 A sample project demonstrating a multi-user lobby system built with a Flask backend and a React frontend (using Vite). The backend leverages Flask-SocketIO for real-time communication, while the frontend uses Socket.IO to interact with the backend. The project features include lobby creation, user join/leave, display name updates, and a "Ready" status toggle—all organized into modular components. The project is built to be integrated with Webex Embedded Apps to provide a seamless real-time experience within Webex Meetings.
 
 ## Features
