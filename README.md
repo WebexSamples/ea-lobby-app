@@ -15,7 +15,7 @@ A sample project demonstrating a multi-user lobby system built with a Flask back
 ## Project Structure
 
 ```
-multi-user-pregame-lobby/
+ea-multiuser-lobby/
 ├── backend/
 │   ├── app.py              # Main Flask app
 │   ├── config.py           # Flask configuration
@@ -71,7 +71,7 @@ In this application, we use the Webex Embedded Apps SDK to interact with the Web
 1. **Navigate to the `backend` folder:**
 
    ```bash
-   cd multi-user-pregame-lobby/backend
+   cd ea-multiuser-lobby/backend
    ```
 
 2. **Create a virtual environment:**
@@ -105,7 +105,7 @@ In this application, we use the Webex Embedded Apps SDK to interact with the Web
 1. **Navigate to the `frontend` folder:**
 
    ```bash
-   cd multi-user-pregame-lobby/frontend
+   cd ea-multiuser-lobby/frontend
    ```
 
 2. **Install Node dependencies:**
@@ -118,7 +118,7 @@ In this application, we use the Webex Embedded Apps SDK to interact with the Web
 
 ### Start the Backend
 
-From the project root (`multi-user-pregame-lobby`), run:
+From the project root (`ea-multiuser-lobby`), run:
 
 ```bash
 python -m backend.app
