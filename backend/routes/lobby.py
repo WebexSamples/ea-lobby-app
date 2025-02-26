@@ -1,6 +1,7 @@
 # backend/routes/lobby.py
 from flask import Blueprint, request, jsonify
 import uuid
+from ..config import Config
 
 lobby_bp = Blueprint('lobby_bp', __name__)
 
@@ -26,13 +27,17 @@ def create_lobby():
         return jsonify({'error': 'host_id is required'}), 400
     
     lobby_id = str(uuid.uuid4())
+    
     # Store the host as a participant with ready state defaulted to False
     lobbies[lobby_id] = {
         'host': host_id,
         'lobby_name': lobby_name,
         'participants': [{'id': host_id, 'display_name': data.get('host_display_name', 'Host'), 'ready': False}]
     }
-    lobby_url = f"http://localhost:5000/lobby/{lobby_id}"
+    
+    # Use Config.FRONTEND_URL to generate the lobby link
+    lobby_url = f"{Config.FRONTEND_URL}/lobby/{lobby_id}"
+
     return jsonify({'lobby_id': lobby_id, 'lobby_url': lobby_url, 'lobby_name': lobby_name}), 201
 
 @lobby_bp.route('/lobby/<lobby_id>', methods=['GET'])

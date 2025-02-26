@@ -15,6 +15,7 @@ venv/
 # environments
 .env.development
 .env.production
+.env
 
 # nginx config
 lobby.local.conf
