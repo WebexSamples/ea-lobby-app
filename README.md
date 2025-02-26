@@ -48,7 +48,6 @@ ea-multiuser-lobby/
         └── constants.js    # Socket event constants for the frontend
 ```
 
-
 ## Using with Webex Embedded Apps
 
 This project can be integrated with Webex Embedded Apps to enhance the user experience within Webex. For more information on how to use Webex Embedded Apps, refer to the following documentation:
