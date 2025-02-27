@@ -1,17 +1,20 @@
-// src/components/CreateLobby.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Container, Typography, CircularProgress } from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
+import { ROUTES } from '../constants';
 import useWebex from '../hooks/useWebex';
+import api from '../utils/api';
 
 const CreateLobby = () => {
   const navigate = useNavigate();
   const [lobbyName, setLobbyName] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const { webexData, loading } = useWebex();
+  const [loading, setLoading] = useState(false);
+  const { webexData } = useWebex();
 
-  useEffect(() => {
+  // Set default values from Webex SDK
+  useState(() => {
     if (webexData) {
       setLobbyName(webexData.meeting.title);
       setDisplayName(webexData.user.displayName);
@@ -19,57 +22,52 @@ const CreateLobby = () => {
   }, [webexData]);
 
   const handleCreateLobby = async () => {
-    if (!lobbyName.trim() || !displayName.trim()) {
-      alert('Please enter both a lobby name and your display name.');
-      return;
-    }
-    // Generate a UUID for the host user
-    const hostId = uuidv4();
+    if (!lobbyName.trim() || !displayName.trim()) return;
+    setLoading(true);
+    
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/lobby`,
-        {
-          host_id: hostId,
-          host_display_name: displayName,
-          lobby_name: lobbyName,
-        },
-      );
-      const { lobby_id } = response.data;
-      // Navigate to the lobby page, passing the host's user object in location state
-      navigate(`/lobby/${lobby_id}`, {
+      const hostId = uuidv4();
+      const data = await api.createLobby(hostId, displayName, lobbyName);
+      navigate(ROUTES.LOBBY_WITH_ID(data.lobby_id), {
         state: { user: { id: hostId, display_name: displayName } },
       });
     } catch (error) {
       console.error('Error creating lobby:', error);
-      alert('Failed to create lobby. Please check the console for details.');
+      alert(error.message || 'Failed to create lobby.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-      <h2>Create a Lobby</h2>
-      {loading && <p>Loading Webex...</p>}
-      <input
-        type="text"
-        placeholder="Lobby Name"
+    <Container maxWidth="sm" sx={{ textAlign: 'center', mt: 4 }}>
+      <Typography variant="h4">Create a Lobby</Typography>
+      <TextField
+        fullWidth
+        label="Lobby Name"
+        variant="outlined"
+        margin="normal"
         value={lobbyName}
         onChange={(e) => setLobbyName(e.target.value)}
-        style={{ padding: '0.5rem', fontSize: '1rem', marginRight: '1rem' }}
       />
-      <input
-        type="text"
-        placeholder="Your Display Name"
+      <TextField
+        fullWidth
+        label="Your Display Name"
+        variant="outlined"
+        margin="normal"
         value={displayName}
         onChange={(e) => setDisplayName(e.target.value)}
-        style={{ padding: '0.5rem', fontSize: '1rem', marginRight: '1rem' }}
       />
-      <button
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mt: 2 }}
         onClick={handleCreateLobby}
-        style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}
+        disabled={loading}
       >
-        Create Lobby
-      </button>
-    </div>
+        {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Create Lobby'}
+      </Button>
+    </Container>
   );
 };
 

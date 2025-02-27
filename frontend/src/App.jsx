@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme, Container } from '@mui/material';
 import CreateLobby from './components/CreateLobby';
 import Lobby from './components/Lobby';
 import Navbar from './components/Navbar';
+import LandingPage from './components/LandingPage';
+import BreadcrumbsNav from './components/BreadcrumbsNav';
+import { ROUTES } from './constants';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -18,11 +21,30 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
-      <Routes>
-        <Route path="/create-lobby" element={<CreateLobby />} />
-        <Route path="/lobby/:lobbyId" element={<Lobby />} />
-        <Route path="*" element={<CreateLobby />} />
-      </Routes>
+      <Container>
+        <Routes>
+          <Route path={ROUTES.HOME} element={<LandingPage />} />
+          <Route 
+            path={ROUTES.LOBBY} 
+            element={
+              <>
+                <BreadcrumbsNav />
+                <CreateLobby />
+              </>
+            } 
+          />
+          <Route 
+            path={ROUTES.LOBBY_WITH_ID(':lobbyId')} 
+            element={
+              <>
+                <BreadcrumbsNav />
+                <Lobby />
+              </>
+            } 
+          />
+          <Route path="*" element={<LandingPage />} />
+        </Routes>
+      </Container>
     </ThemeProvider>
   );
 }
