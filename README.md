@@ -2,62 +2,19 @@
 
 ![Launch Pad Image](image.png)
 
-A sample project demonstrating a multi-user lobby system built with a Flask backend and a React frontend (using Vite). The backend leverages Flask-SocketIO for real-time communication, while the frontend uses Socket.IO to interact with the backend. The project features include lobby creation, user join/leave, display name updates, and a "Ready" status toggle—all organized into modular components. The project is built to be integrated with Webex Embedded Apps to provide a seamless real-time experience within Webex Meetings.
+A Webex Embedded App starter project providing a **real-time multi-user lobby system** for seamless collaboration within Webex Meetings. This project uses a **Flask backend** with **Flask-SocketIO** for real-time communication and a **React frontend** powered by **Vite**. Users can create, join, and manage lobbies dynamically with WebSocket-based updates. The project is built to be integrated with Webex Embedded Apps to provide a seamless real-time experience within Webex Meetings.
 
 ## Features
 
-- **Lobby Creation:** Create a lobby with a custom lobby name.
-- **User Join/Leave:** Users can join or leave a lobby without navigating away.
-- **Unique User Identification:** Each user is assigned a unique UUID, and their display name is stored separately.
-- **Display Name Update:** Users can update their display name.
-- **Ready Toggle:** Users can switch between "Ready" and "Not Ready" states.
-- **Real-Time Updates:** All lobby updates are pushed in real time using Socket.IO.
-- **Modular Codebase:** Clear separation of concerns with dedicated modules for REST routes, socket handlers, and constants.
-
-## Project Structure
-
-```
-ea-multiuser-lobby/
-├── backend/
-│   ├── app.py              # Main Flask app
-│   ├── config.py           # Flask configuration
-│   ├── constants.py        # Socket event constants
-│   ├── requirements.txt    # Python dependencies
-│   ├── __init__.py         # Marks the backend directory as a package
-│   ├── routes/
-│   │   ├── __init__.py     # Marks the routes directory as a package
-│   │   └── lobby.py        # REST routes for lobby management
-│   ├── sockets/
-│   │   ├── __init__.py     # Marks the sockets directory as a package
-│   │   └── lobby.py        # Socket.IO event handlers for lobby events
-│   └── utils/
-│       ├── __init__.py     # Marks the utils directory as a package
-│       └── helpers.py      # Utility functions
-└── frontend/
-    ├── index.html          # Main HTML template for React
-    ├── package.json        # Node dependencies and scripts
-    ├── vite.config.js      # Vite configuration file
-    ├── public/             # Public assets (optional)
-    └── src/
-        ├── assets/         # Static assets (images, styles, etc.)
-        ├── components/
-        │   ├── CreateLobby.jsx  # Component for lobby creation
-        │   └── Lobby.jsx        # Component for joining and interacting in a lobby
-        ├── App.jsx         # Main React component with routing
-        ├── main.jsx        # React entry point
-        └── constants.js    # Socket event constants for the frontend
-```
-
-## Using with Webex Embedded Apps
-
-This project can be integrated with Webex Embedded Apps to enhance the user experience within Webex. For more information on how to use Webex Embedded Apps, refer to the following documentation:
-
-- [Webex Embedded Apps Documentation](https://developer.webex.com/docs/embedded-apps)
-- [Webex Embedded Apps SDK Documentation](https://eaf-sdk.webex.com/)
-
-By integrating with Webex Embedded Apps, you can leverage the capabilities of Webex to provide a seamless and interactive experience for users within the Webex environment.
-
-In this application, we use the Webex Embedded Apps SDK to interact with the Webex platform and provide a more integrated experience for users. The SDK allows us to get the current meeting's title and use it as the lobby name when creating a new lobby. We also use the SDK to get the current user's display name and use it as the default display name when joining a lobby.
+| Feature                            | Description                                                   |
+| ---------------------------------- | ------------------------------------------------------------- |
+| **Lobby Creation**                 | Users can create a lobby with a custom name.                  |
+| **Join & Leave**                   | Participants can enter or exit lobbies in real-time.          |
+| **Unique IDs**                     | Each user receives a unique UUID for tracking.                |
+| **Display Name Updates**           | Users can modify their display names.                         |
+| **Ready Toggle**                   | Participants can mark themselves as "Ready" or "Not Ready."   |
+| **Real-Time Updates**              | Instant lobby state updates with **Socket.IO**.               |
+| **Webex Embedded App Integration** | Fetches meeting details and integrates seamlessly into Webex. |
 
 ## Installation
 
@@ -69,131 +26,128 @@ In this application, we use the Webex Embedded Apps SDK to interact with the Web
 
 ### Backend Setup
 
-1. **Navigate to the `backend` folder:**
-
-   ```bash
-   cd ea-multiuser-lobby/backend
-   ```
-
-2. **Create a virtual environment:**
-
-   ```bash
-   python -m venv venv
-   ```
-
-3. **Activate the virtual environment:**
-
-   - On macOS/Linux:
-
-     ```bash
-     source venv/bin/activate
-     ```
-
-   - On Windows:
-
-     ```bash
-     venv\Scripts\activate
-     ```
-
-4. **Install the required packages:**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
+```sh
+cd backend
+python -m venv venv
+source venv/bin/activate  # macOS/Linux
+# venv\Scripts\activate   # Windows
+pip install -r requirements.txt
+```
 
 ### Frontend Setup
 
-1. **Navigate to the `frontend` folder:**
-
-   ```bash
-   cd ea-multiuser-lobby/frontend
-   ```
-
-2. **Install Node dependencies:**
-
-   ```bash
-   npm install
-   ```
+```sh
+cd frontend
+npm install
+```
 
 ## Running the Project
 
 ### Start the Backend
 
-From the project root (`ea-multiuser-lobby`), run:
-
-```bash
+```sh
 python -m backend.app
 ```
 
-This starts the Flask server with Socket.IO on the default port (5000).
+This starts the Flask server with Socket.IO on port **5000**.
 
 ### Start the Frontend
 
-In a separate terminal, navigate to the `frontend` folder and run:
-
-```bash
+```sh
 npm run dev
 ```
 
-This starts the Vite development server, usually available at `http://localhost:5173`.
+The Vite development server usually runs at **http://localhost:5173**.
 
-## Usage
+## API Endpoints
 
-### Creating a Lobby
+### Create a Lobby
 
-1. Navigate to `http://localhost:5173/create-lobby` in your browser.
-2. Enter a lobby name and your display name.
-3. Click **Create Lobby**. You will be redirected to the lobby page with your host details auto-joined.
+**POST** `/api/lobby`
 
-### Joining an Existing Lobby
-
-- If you’re not the host, navigate to `http://localhost:5173/lobby/<lobby_id>`:
-  - Enter your display name and click **Join Lobby**.
-
-### Lobby Controls
-
-- **Toggle Ready:** Click the **Toggle Ready** button to switch between "Ready" and "Not Ready."
-- **Update Display Name:** Enter a new display name and click **Update Name**.
-- **Leave Lobby:** Click **Leave Lobby** to exit the lobby. The page remains on the lobby view, allowing you to rejoin if desired.
-
-## Socket Event Constants
-
-Both the backend and frontend use centralized constants to manage socket event names:
-
-- **Backend:** `backend/constants.py`
-- **Frontend:** `frontend/src/constants.js`
-
-Example constants:
-
-```python
-# backend/constants.py
-LOBBY_JOIN = 'lobby:join'
-LOBBY_LEAVE = 'lobby:leave'
-LOBBY_UPDATE_DISPLAY_NAME = 'lobby:update_display_name'
-LOBBY_TOGGLE_READY = 'lobby:toggle_ready'
-LOBBY_UPDATE = 'lobby:update'
-LOBBY_ERROR = 'lobby:error'
+```json
+{
+  "host_id": "user123",
+  "host_display_name": "Alice",
+  "lobby_name": "Team Discussion"
+}
 ```
 
-```js
-// frontend/src/constants.js
-export const SOCKET_EVENTS = {
-  LOBBY_JOIN: 'lobby:join',
-  LOBBY_LEAVE: 'lobby:leave',
-  LOBBY_UPDATE_DISPLAY_NAME: 'lobby:update_display_name',
-  LOBBY_TOGGLE_READY: 'lobby:toggle_ready',
-  LOBBY_UPDATE: 'lobby:update',
-  LOBBY_ERROR: 'lobby:error',
-};
+_Response:_
+
+```json
+{
+  "lobby_id": "abcd-1234",
+  "lobby_url": "http://localhost:5173/lobby/abcd-1234",
+  "lobby_name": "Team Discussion"
+}
 ```
 
-## Acknowledgements
+### Get Lobby Details
 
-- [Flask](https://flask.palletsprojects.com/)
-- [Flask-SocketIO](https://flask-socketio.readthedocs.io/)
-- [Vite](https://vitejs.dev/)
-- [React](https://reactjs.org/)
+**GET** `/api/lobby/{lobby_id}`
 
-## Thanks!
+_Response:_
 
-Made with <3 by the Webex Developer Relations Team at Cisco
+```json
+{
+  "host": "user123",
+  "lobby_name": "Team Discussion",
+  "participants": [{ "id": "user123", "display_name": "Alice", "ready": false }]
+}
+```
+
+## Webex Integration
+
+This project leverages the **Webex Embedded Apps SDK** to enhance the experience inside Webex Meetings.
+
+### How It Works
+
+- **Meeting Details:** The app automatically retrieves the **Webex meeting title** and sets it as the **lobby name**.
+- **User Identity:** The app fetches the current user's **display name** from Webex.
+- **Deep Linking:** Webex users can share the lobby link **within the Webex meeting interface**.
+
+_For Webex SDK documentation, see:_ [Webex Embedded Apps Documentation](https://developer.webex.com/docs/embedded-apps).
+
+## Development & Contribution
+
+### Code Formatting
+
+This project enforces consistent coding style using:
+
+- **Prettier** for JavaScript (`npm run format`)
+- **Ruff** for Python (`ruff check --fix .`)
+
+### Git Workflow
+
+- Fork & clone the repo
+- Create a feature branch (`git checkout -b feature-xyz`)
+- Submit a **Pull Request**
+
+## Deployment Guide
+
+To serve the app in a **production-like** setup:
+
+### **Nginx Reverse Proxy Setup**
+
+1. **Update your hosts file** (`/etc/hosts` or `C:\Windows\System32\drivers\etc\hosts`):
+
+```
+127.0.0.1 lobby.local
+```
+
+2. **Generate SSL certificates** (e.g., with mkcert or Let's Encrypt).
+3. **Deploy frontend**:
+
+```sh
+cd frontend
+npm run build
+```
+
+4. **Run Flask backend & Nginx**.
+
+_See the `SERVING.md` file for more details on production setup._
+
+## Acknowledgments
+
+Built by the **Webex Developer Relations Team** at Cisco ❤️
