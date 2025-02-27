@@ -1,153 +1,47 @@
-// src/components/Lobby.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
-import io from 'socket.io-client';
-import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
-import { SOCKET_EVENTS } from '../constants';
+import { ROUTES } from '../constants';
 import useWebex from '../hooks/useWebex';
-
-const socket = io(import.meta.env.VITE_SOCKET_URL); // Adjust URL if needed
+import useLobby from '../hooks/useLobby';
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  Link,
+  Grid2
+} from '@mui/material';
 
 const Lobby = () => {
   const { lobbyId } = useParams();
   const location = useLocation();
-  const [lobby, setLobby] = useState(null);
-  const [displayName, setDisplayName] = useState('');
-  const [newDisplayName, setNewDisplayName] = useState('');
-  const [joined, setJoined] = useState(false);
-  const [lobbyUrl, setLobbyUrl] = useState('');
-  // User object: { id: uuid, display_name: string }
-  const [user, setUser] = useState(null);
-
   const { webexData } = useWebex();
 
-  // If the user object is passed from CreateLobby, use it to auto-join
-  useEffect(() => {
-    if (location.state && location.state.user && !user) {
-      setUser(location.state.user);
-      setDisplayName(location.state.user.display_name);
-      setJoined(true);
-      setLobbyUrl(`${window.location.origin}/lobby/${lobbyId}`);
-      socket.emit(SOCKET_EVENTS.LOBBY_JOIN, {
-        lobby_id: lobbyId,
-        user: location.state.user,
-      });
-      axios
-        .get(`${import.meta.env.VITE_API_URL}/lobby/${lobbyId}`)
-        .then((response) => setLobby(response.data))
-        .catch((error) => {
-          console.error('Error fetching lobby:', error);
-          alert('Lobby not found.');
-        });
-    }
-  }, [location.state, lobbyId, user]);
+  // Generate a default user if none exists
+  const [user, setUser] = useState(
+    location.state?.user || { id: uuidv4(), display_name: `Guest-${Math.floor(Math.random() * 1000)}` }
+  );
+
+  const { lobby, loading, joined, joinLobby, leaveLobby, toggleReady, updateDisplayName } = useLobby(lobbyId, user);
+
+  const [displayName, setDisplayName] = useState(user.display_name);
+  const [newDisplayName, setNewDisplayName] = useState('');
+  const lobbyUrl = `${window.location.origin}${ROUTES.LOBBY_WITH_ID(lobbyId)}`;
 
   useEffect(() => {
     if (webexData) {
       setDisplayName(webexData.user.displayName);
+      setUser((prevUser) => ({ ...prevUser, display_name: webexData.user.displayName }));
     }
   }, [webexData]);
 
-  // Listen for lobby updates only after joining
-  useEffect(() => {
-    if (joined) {
-      socket.on(SOCKET_EVENTS.LOBBY_UPDATE, (data) => {
-        setLobby(data);
-      });
-    }
-    return () => {
-      if (joined) {
-        socket.off(SOCKET_EVENTS.LOBBY_UPDATE);
-      }
-    };
-  }, [joined]);
-
-  // Handle manual join for users who did not come from CreateLobby
   const handleJoin = () => {
-    if (!displayName.trim()) {
-      alert('Please enter a display name.');
-      return;
-    }
-    // Generate a UUID for this user if one hasn't been generated
-    const userId = uuidv4();
-    const userObj = { id: userId, display_name: displayName };
-    setUser(userObj);
-    socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: userObj });
-    setJoined(true);
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/lobby/${lobbyId}`)
-      .then((response) => setLobby(response.data))
-      .catch((error) => {
-        console.error('Error fetching lobby:', error);
-        alert('Lobby not found.');
-      });
+    const result = joinLobby(displayName);
+    if (result.error) alert(result.error);
   };
-
-  // Handle leaving the lobby (stay on the same page)
-  const handleLeave = () => {
-    if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, {
-        lobby_id: lobbyId,
-        user_id: user.id,
-      });
-      setJoined(false);
-      // Optionally, clear lobby info or let it persist
-    }
-  };
-
-  // Handle updating the display name
-  const handleUpdateDisplayName = () => {
-    if (!newDisplayName.trim()) {
-      alert('Please enter a new display name.');
-      return;
-    }
-    if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_UPDATE_DISPLAY_NAME, {
-        lobby_id: lobbyId,
-        user_id: user.id,
-        new_display_name: newDisplayName,
-      });
-      setUser({ ...user, display_name: newDisplayName });
-      setNewDisplayName('');
-    }
-  };
-
-  // Handle toggling ready status
-  const handleToggleReady = () => {
-    if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, {
-        lobby_id: lobbyId,
-        user_id: user.id,
-      });
-    }
-  };
-
-  // If not joined, display join form
-  if (!joined) {
-    return (
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <h2>Lobby ID: {lobbyId}</h2>
-        <input
-          type="text"
-          placeholder="Enter your display name"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-          style={{ padding: '0.5rem', fontSize: '1rem' }}
-        />
-        <button
-          onClick={handleJoin}
-          style={{
-            padding: '0.5rem 1rem',
-            marginLeft: '1rem',
-            fontSize: '1rem',
-          }}
-        >
-          Join Lobby
-        </button>
-      </div>
-    );
-  }
 
   const handleSetShareURL = async () => {
     if (webexData) {
@@ -159,75 +53,96 @@ const Lobby = () => {
     }
   };
 
-  if (!lobby) {
+  if (loading) return <Typography textAlign="center">Loading lobby...</Typography>;
+
+  if (!joined) {
     return (
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        Loading lobby...
-      </div>
+      <Box sx={{ textAlign: 'center', mt: 4 }}>
+        <Typography variant="h5">Join Lobby</Typography>
+        <TextField
+          fullWidth
+          label="Enter your display name"
+          variant="outlined"
+          value={displayName}
+          onChange={(e) => setDisplayName(e.target.value)}
+          sx={{ mt: 2 }}
+        />
+        <Button variant="contained" sx={{ mt: 2 }} onClick={handleJoin}>
+          Join Lobby
+        </Button>
+      </Box>
     );
   }
 
-  // Display lobby details and controls for joined users
   return (
-    <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-      <h2>Lobby Name: {lobby.lobby_name}</h2>
-      <h3>Lobby ID: {lobbyId}</h3>
-      <h3>
-        Lobby URL: <a href={lobbyUrl}>{lobbyUrl}</a>
-      </h3>
-      <button
-        disabled={!webexData}
-        onClick={handleSetShareURL}
-        style={{ padding: '0.5rem 1rem', fontSize: '1rem' }}
-      >
-        Open Lobby
-      </button>
-      <h3>Your Display Name: {user && user.display_name}</h3>
-      <h3>Participants:</h3>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {lobby.participants.map((participant, index) => (
-          <li key={index}>
-            {participant.display_name} (
-            {participant.ready ? 'Ready' : 'Not Ready'})
-          </li>
-        ))}
-      </ul>
-      <div style={{ marginTop: '1rem' }}>
-        <button
-          onClick={handleToggleReady}
-          style={{
-            padding: '0.5rem 1rem',
-            fontSize: '1rem',
-            marginRight: '1rem',
-          }}
-        >
-          Toggle Ready
-        </button>
-        <input
-          type="text"
-          placeholder="Enter new display name"
-          value={newDisplayName}
-          onChange={(e) => setNewDisplayName(e.target.value)}
-          style={{ padding: '0.5rem', fontSize: '1rem' }}
-        />
-        <button
-          onClick={handleUpdateDisplayName}
-          style={{
-            padding: '0.5rem 1rem',
-            marginLeft: '1rem',
-            fontSize: '1rem',
-          }}
-        >
-          Update Name
-        </button>
-      </div>
-      <button
-        onClick={handleLeave}
-        style={{ padding: '0.5rem 1rem', fontSize: '1rem', marginTop: '1rem' }}
-      >
-        Leave Lobby
-      </button>
-    </div>
+    <Box sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
+      {/* Lobby Information */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h5" fontWeight="bold">{lobby.lobby_name}</Typography>
+          <Typography variant="body2" color="textSecondary">
+            Lobby ID: {lobbyId}
+          </Typography>
+          <Typography variant="body2">
+            Lobby URL:{' '}
+            <Link href={lobbyUrl} target="_blank">{lobbyUrl}</Link>
+          </Typography>
+          <Button
+            variant="contained"
+            disabled={!webexData}
+            onClick={handleSetShareURL}
+            sx={{ mt: 2 }}
+          >
+            Share Lobby in Webex
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Participants List */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h6">Participants</Typography>
+          {lobby.participants.map((participant) => (
+            <Typography key={participant.id} sx={{ mt: 1 }}>
+              {participant.display_name} {participant.ready ? '(✅ Ready)' : '(❌ Not Ready)'}
+            </Typography>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Participant Actions */}
+      <Card>
+        <CardContent>
+          <Typography variant="h6">Your Actions</Typography>
+          <Grid2 container spacing={2} sx={{ mt: 1 }}>
+            <Grid2 xs={12} sm={6}>
+              <Button fullWidth variant="contained" onClick={toggleReady}>
+                Toggle Ready
+              </Button>
+            </Grid2>
+            <Grid2 xs={12} sm={6}>
+              <Button fullWidth variant="outlined" onClick={leaveLobby}>
+                Leave Lobby
+              </Button>
+            </Grid2>
+            <Grid2 xs={8}>
+              <TextField
+                fullWidth
+                label="New Display Name"
+                variant="outlined"
+                value={newDisplayName}
+                onChange={(e) => setNewDisplayName(e.target.value)}
+              />
+            </Grid2>
+            <Grid2 xs={4}>
+              <Button fullWidth variant="contained" onClick={() => updateDisplayName(newDisplayName)}>
+                Update Name
+              </Button>
+            </Grid2>
+          </Grid2>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
 
