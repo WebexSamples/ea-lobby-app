@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ROUTES } from '../constants';
 import useWebex from '../hooks/useWebex';
 import useLobby from '../hooks/useLobby';
+import LobbyParticipants from './LobbyParticipants';
 import {
   Card,
   CardContent,
@@ -93,38 +94,23 @@ const Lobby = () => {
             onClick={handleSetShareURL}
             sx={{ mt: 2 }}
           >
-            Share Lobby in Webex
+            Share Lobby to Webex
           </Button>
         </CardContent>
       </Card>
 
-      {/* Participants List */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6">Participants</Typography>
-          {lobby.participants.map((participant) => (
-            <Typography key={participant.id} sx={{ mt: 1 }}>
-              {participant.display_name} {participant.ready ? '(✅ Ready)' : '(❌ Not Ready)'}
-            </Typography>
-          ))}
-        </CardContent>
-      </Card>
+      {/* Participants Table */}
+      <LobbyParticipants
+        participants={lobby.participants}
+        currentUser={user}
+        toggleReady={toggleReady}
+      />
 
       {/* Participant Actions */}
-      <Card>
+      <Card sx={{ mt: 3 }}>
         <CardContent>
           <Typography variant="h6">Your Actions</Typography>
           <Grid2 container spacing={2} sx={{ mt: 1 }}>
-            <Grid2 xs={12} sm={6}>
-              <Button fullWidth variant="contained" onClick={toggleReady}>
-                Toggle Ready
-              </Button>
-            </Grid2>
-            <Grid2 xs={12} sm={6}>
-              <Button fullWidth variant="outlined" onClick={leaveLobby}>
-                Leave Lobby
-              </Button>
-            </Grid2>
             <Grid2 xs={8}>
               <TextField
                 fullWidth
@@ -137,6 +123,11 @@ const Lobby = () => {
             <Grid2 xs={4}>
               <Button fullWidth variant="contained" onClick={() => updateDisplayName(newDisplayName)}>
                 Update Name
+              </Button>
+            </Grid2>
+            <Grid2 xs={12} sx={{ mt: 2 }}>
+              <Button fullWidth variant="outlined" color="error" onClick={leaveLobby}>
+                Leave Lobby
               </Button>
             </Grid2>
           </Grid2>
