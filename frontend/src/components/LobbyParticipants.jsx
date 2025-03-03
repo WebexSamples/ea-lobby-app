@@ -1,5 +1,15 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+} from '@mui/material';
 import PropTypes from 'prop-types';
 
 const LobbyParticipants = ({ participants, currentUser, toggleReady }) => {
@@ -8,9 +18,15 @@ const LobbyParticipants = ({ participants, currentUser, toggleReady }) => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell><strong>Display Name</strong></TableCell>
-            <TableCell align="center"><strong>Ready</strong></TableCell>
-            <TableCell align="right"><strong>Actions</strong></TableCell>
+            <TableCell>
+              <strong>Display Name</strong>
+            </TableCell>
+            <TableCell align="center">
+              <strong>Ready</strong>
+            </TableCell>
+            <TableCell align="right">
+              <strong>Actions</strong>
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

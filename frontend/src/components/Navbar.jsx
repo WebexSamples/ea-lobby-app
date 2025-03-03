@@ -1,6 +1,9 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, IconButton } from '@mui/material';
-import { Brightness4 as DarkModeIcon, Brightness7 as LightModeIcon } from '@mui/icons-material';
+import {
+  Brightness4 as DarkModeIcon,
+  Brightness7 as LightModeIcon,
+} from '@mui/icons-material';
 import PropTypes from 'prop-types';
 
 const Navbar = ({ darkMode, setDarkMode }) => {

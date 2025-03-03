@@ -15,11 +15,19 @@ const BreadcrumbsNav = () => {
   return (
     <Box sx={{ mt: 2, mb: 2 }}>
       <Breadcrumbs separator="›" aria-label="breadcrumb">
-        <Link color="inherit" onClick={() => navigate(ROUTES.HOME)} sx={{ cursor: 'pointer' }}>
+        <Link
+          color="inherit"
+          onClick={() => navigate(ROUTES.HOME)}
+          sx={{ cursor: 'pointer' }}
+        >
           Home
         </Link>
         {pathnames.includes('lobby') && (
-          <Link color="inherit" onClick={() => navigate(ROUTES.LOBBY)} sx={{ cursor: 'pointer' }}>
+          <Link
+            color="inherit"
+            onClick={() => navigate(ROUTES.LOBBY)}
+            sx={{ cursor: 'pointer' }}
+          >
             Lobby
           </Link>
         )}

@@ -1,10 +1,25 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { 
-  Card, CardContent, Typography, Button, TextField, Grid2, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle 
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  TextField,
+  Grid2,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
 
-const LobbyActions = ({ newDisplayName, setNewDisplayName, updateDisplayName, leaveLobby }) => {
+const LobbyActions = ({
+  newDisplayName,
+  setNewDisplayName,
+  updateDisplayName,
+  leaveLobby,
+}) => {
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleLeaveLobby = () => {
@@ -32,20 +47,20 @@ const LobbyActions = ({ newDisplayName, setNewDisplayName, updateDisplayName, le
               />
             </Grid2>
             <Grid2 xs={4}>
-              <Button 
-                fullWidth 
-                variant="contained" 
-                disabled={!newDisplayName.trim()} 
+              <Button
+                fullWidth
+                variant="contained"
+                disabled={!newDisplayName.trim()}
                 onClick={() => updateDisplayName(newDisplayName)}
               >
                 Update Name
               </Button>
             </Grid2>
             <Grid2 xs={12} sx={{ mt: 2 }}>
-              <Button 
-                fullWidth 
-                variant="outlined" 
-                color="error" 
+              <Button
+                fullWidth
+                variant="outlined"
+                color="error"
                 onClick={handleLeaveLobby}
               >
                 Leave Lobby
@@ -60,7 +75,8 @@ const LobbyActions = ({ newDisplayName, setNewDisplayName, updateDisplayName, le
         <DialogTitle>Leave Lobby</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to leave the lobby? You may need to rejoin if you leave.
+            Are you sure you want to leave the lobby? You may need to rejoin if
+            you leave.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { CssBaseline, ThemeProvider, createTheme, Container } from '@mui/material';
+import {
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+  Container,
+} from '@mui/material';
 import CreateLobby from './components/CreateLobby';
 import Lobby from './components/Lobby';
 import Navbar from './components/Navbar';
@@ -24,23 +29,23 @@ function App() {
       <Container>
         <Routes>
           <Route path={ROUTES.HOME} element={<LandingPage />} />
-          <Route 
-            path={ROUTES.LOBBY} 
+          <Route
+            path={ROUTES.LOBBY}
             element={
               <>
                 <BreadcrumbsNav />
                 <CreateLobby />
               </>
-            } 
+            }
           />
-          <Route 
-            path={ROUTES.LOBBY_WITH_ID(':lobbyId')} 
+          <Route
+            path={ROUTES.LOBBY_WITH_ID(':lobbyId')}
             element={
               <>
                 <BreadcrumbsNav />
                 <Lobby />
               </>
-            } 
+            }
           />
           <Route path="*" element={<LandingPage />} />
         </Routes>

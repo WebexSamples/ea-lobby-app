@@ -34,7 +34,13 @@ const useLobby = (lobbyId, initialUser) => {
   const [joined, setJoined] = useState(false);
   const [user, setUser] = useState(() => {
     const savedUser = JSON.parse(localStorage.getItem(`lobbyUser-${lobbyId}`));
-    return savedUser || initialUser || { id: uuidv4(), display_name: `Guest-${Math.floor(Math.random() * 1000)}` };
+    return (
+      savedUser ||
+      initialUser || {
+        id: uuidv4(),
+        display_name: `Guest-${Math.floor(Math.random() * 1000)}`,
+      }
+    );
   });
 
   // Generate lobby URL
@@ -50,7 +56,8 @@ const useLobby = (lobbyId, initialUser) => {
     }
 
     setLoading(true);
-    api.getLobby(lobbyId)
+    api
+      .getLobby(lobbyId)
       .then((data) => {
         cache[lobbyId] = data;
         setLobby(data);
@@ -99,7 +106,10 @@ const useLobby = (lobbyId, initialUser) => {
    */
   const leaveLobby = () => {
     if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, { lobby_id: lobbyId, user_id: user.id });
+      socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, {
+        lobby_id: lobbyId,
+        user_id: user.id,
+      });
       setJoined(false);
       localStorage.removeItem(`lobbyUser-${lobbyId}`);
     }
@@ -110,7 +120,10 @@ const useLobby = (lobbyId, initialUser) => {
    */
   const toggleReady = () => {
     if (user) {
-      socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, { lobby_id: lobbyId, user_id: user.id });
+      socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, {
+        lobby_id: lobbyId,
+        user_id: user.id,
+      });
     }
   };
 

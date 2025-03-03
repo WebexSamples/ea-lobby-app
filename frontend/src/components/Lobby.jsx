@@ -15,14 +15,32 @@ const Lobby = () => {
 
   // Load user from localStorage or generate a guest user
   const storedUser = JSON.parse(localStorage.getItem(`lobbyUser-${lobbyId}`));
-  const [user, setUser] = useState(storedUser || location.state?.user || { id: uuidv4(), display_name: `Guest-${Math.floor(Math.random() * 1000)}` });
+  const [user, setUser] = useState(
+    storedUser ||
+      location.state?.user || {
+        id: uuidv4(),
+        display_name: `Guest-${Math.floor(Math.random() * 1000)}`,
+      },
+  );
 
-  const { lobby, loading, joined, joinLobby, leaveLobby, toggleReady, updateDisplayName, lobbyUrl } = useLobby(lobbyId, user);
+  const {
+    lobby,
+    loading,
+    joined,
+    joinLobby,
+    leaveLobby,
+    toggleReady,
+    updateDisplayName,
+    lobbyUrl,
+  } = useLobby(lobbyId, user);
   const [newDisplayName, setNewDisplayName] = useState('');
 
   useEffect(() => {
     if (webexData) {
-      setUser((prevUser) => ({ ...prevUser, display_name: webexData.user.displayName }));
+      setUser((prevUser) => ({
+        ...prevUser,
+        display_name: webexData.user.displayName,
+      }));
     }
   }, [webexData]);
 
@@ -33,22 +51,27 @@ const Lobby = () => {
     }
   }, [joined, user, joinLobby]);
 
-  if (loading) return <Typography textAlign="center">Loading lobby...</Typography>;
+  if (loading)
+    return <Typography textAlign="center">Loading lobby...</Typography>;
 
   return (
     <Box sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
       {/* Lobby Information */}
-      <LobbyDetails 
+      <LobbyDetails
         lobbyId={lobbyId}
         lobbyName={lobby.lobby_name}
         lobbyUrl={lobbyUrl}
       />
 
       {/* Participants Table */}
-      <LobbyParticipants participants={lobby.participants} currentUser={user} toggleReady={toggleReady} />
+      <LobbyParticipants
+        participants={lobby.participants}
+        currentUser={user}
+        toggleReady={toggleReady}
+      />
 
       {/* Participant Actions */}
-      <LobbyActions 
+      <LobbyActions
         newDisplayName={newDisplayName}
         setNewDisplayName={setNewDisplayName}
         updateDisplayName={updateDisplayName}

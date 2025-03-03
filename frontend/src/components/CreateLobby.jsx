@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, CircularProgress } from '@mui/material';
+import {
+  TextField,
+  Button,
+  Container,
+  Typography,
+  CircularProgress,
+} from '@mui/material';
 import { v4 as uuidv4 } from 'uuid';
 import { ROUTES } from '../constants';
 import useWebex from '../hooks/useWebex';
@@ -24,7 +30,7 @@ const CreateLobby = () => {
   const handleCreateLobby = async () => {
     if (!lobbyName.trim() || !displayName.trim()) return;
     setLoading(true);
-    
+
     try {
       const hostId = uuidv4();
       const data = await api.createLobby(hostId, displayName, lobbyName);
@@ -65,7 +71,11 @@ const CreateLobby = () => {
         onClick={handleCreateLobby}
         disabled={loading}
       >
-        {loading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Create Lobby'}
+        {loading ? (
+          <CircularProgress size={24} sx={{ color: 'white' }} />
+        ) : (
+          'Create Lobby'
+        )}
       </Button>
     </Container>
   );
