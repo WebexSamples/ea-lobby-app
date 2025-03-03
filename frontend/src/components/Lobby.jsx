@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-import { ROUTES } from '../constants';
-import useWebex from '../hooks/useWebex';
-import useLobby from '../hooks/useLobby';
-import LobbyParticipants from './LobbyParticipants';
 import {
   Card,
   CardContent,
@@ -12,9 +8,15 @@ import {
   Button,
   TextField,
   Box,
-  Link,
-  Grid2
+  Link
 } from '@mui/material';
+
+
+import { ROUTES } from '../constants';
+import useWebex from '../hooks/useWebex';
+import useLobby from '../hooks/useLobby';
+import LobbyParticipants from './LobbyParticipants';
+import LobbyActions from './LobbyActions';
 
 const Lobby = () => {
   const { lobbyId } = useParams();
@@ -107,32 +109,12 @@ const Lobby = () => {
       />
 
       {/* Participant Actions */}
-      <Card sx={{ mt: 3 }}>
-        <CardContent>
-          <Typography variant="h6">Your Actions</Typography>
-          <Grid2 container spacing={2} sx={{ mt: 1 }}>
-            <Grid2 xs={8}>
-              <TextField
-                fullWidth
-                label="New Display Name"
-                variant="outlined"
-                value={newDisplayName}
-                onChange={(e) => setNewDisplayName(e.target.value)}
-              />
-            </Grid2>
-            <Grid2 xs={4}>
-              <Button fullWidth variant="contained" onClick={() => updateDisplayName(newDisplayName)}>
-                Update Name
-              </Button>
-            </Grid2>
-            <Grid2 xs={12} sx={{ mt: 2 }}>
-              <Button fullWidth variant="outlined" color="error" onClick={leaveLobby}>
-                Leave Lobby
-              </Button>
-            </Grid2>
-          </Grid2>
-        </CardContent>
-      </Card>
+      <LobbyActions 
+        newDisplayName={newDisplayName}
+        setNewDisplayName={setNewDisplayName}
+        updateDisplayName={updateDisplayName}
+        leaveLobby={leaveLobby}
+      />
     </Box>
   );
 };
