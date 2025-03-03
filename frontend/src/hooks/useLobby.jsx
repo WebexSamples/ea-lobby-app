@@ -7,11 +7,16 @@ import { SOCKET_EVENTS } from '../constants';
 const socket = io(import.meta.env.VITE_SOCKET_URL);
 const cache = {}; // In-memory cache
 
-const useLobby = (lobbyId, user) => {
+const useLobby = (lobbyId, initialUser) => {
   const [lobby, setLobby] = useState(cache[lobbyId] || null);
   const [loading, setLoading] = useState(!cache[lobbyId]);
   const [error, setError] = useState(null);
   const [joined, setJoined] = useState(false);
+  const [user, setUser] = useState(() => {
+    // Load from localStorage if available, otherwise use the initial user
+    const savedUser = JSON.parse(localStorage.getItem(`lobbyUser-${lobbyId}`));
+    return savedUser || initialUser || { id: uuidv4(), display_name: `Guest-${Math.floor(Math.random() * 1000)}` };
+  });
 
   useEffect(() => {
     if (!lobbyId) return;
@@ -25,7 +30,7 @@ const useLobby = (lobbyId, user) => {
     setLoading(true);
     api.getLobby(lobbyId)
       .then((data) => {
-        cache[lobbyId] = data; // Store in cache
+        cache[lobbyId] = data;
         setLobby(data);
         setLoading(false);
       })
@@ -36,7 +41,6 @@ const useLobby = (lobbyId, user) => {
       });
   }, [lobbyId]);
 
-  // Socket event listeners
   useEffect(() => {
     if (!joined) return;
 
@@ -50,39 +54,49 @@ const useLobby = (lobbyId, user) => {
     };
   }, [joined, lobbyId]);
 
-  // Join Lobby
   const joinLobby = (displayName) => {
     if (!displayName.trim()) return { error: 'Display name required' };
-    const userObj = user || { id: uuidv4(), display_name: displayName };
+    const userObj = { ...user, display_name: displayName };
+
     socket.emit(SOCKET_EVENTS.LOBBY_JOIN, { lobby_id: lobbyId, user: userObj });
     setJoined(true);
+    setUser(userObj);
+
+    // Store in localStorage for persistence
+    localStorage.setItem(`lobbyUser-${lobbyId}`, JSON.stringify(userObj));
+
     return { user: userObj };
   };
 
-  // Leave Lobby
   const leaveLobby = () => {
     if (user) {
       socket.emit(SOCKET_EVENTS.LOBBY_LEAVE, { lobby_id: lobbyId, user_id: user.id });
       setJoined(false);
+
+      // Remove from localStorage
+      localStorage.removeItem(`lobbyUser-${lobbyId}`);
     }
   };
 
-  // Toggle Ready
   const toggleReady = () => {
     if (user) {
       socket.emit(SOCKET_EVENTS.LOBBY_TOGGLE_READY, { lobby_id: lobbyId, user_id: user.id });
     }
   };
 
-  // Update Display Name
   const updateDisplayName = (newDisplayName) => {
     if (!newDisplayName.trim()) return;
     if (user) {
+      const updatedUser = { ...user, display_name: newDisplayName };
       socket.emit(SOCKET_EVENTS.LOBBY_UPDATE_DISPLAY_NAME, {
         lobby_id: lobbyId,
         user_id: user.id,
         new_display_name: newDisplayName,
       });
+
+      // Update the user object & persist it
+      setUser(updatedUser);
+      localStorage.setItem(`lobbyUser-${lobbyId}`, JSON.stringify(updatedUser));
     }
   };
 
@@ -95,6 +109,7 @@ const useLobby = (lobbyId, user) => {
     leaveLobby,
     toggleReady,
     updateDisplayName,
+    user,
   };
 };
 
