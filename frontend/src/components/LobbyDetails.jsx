@@ -1,8 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, CardContent, Typography, Link } from '@mui/material';
+import { Button, Card, CardContent, Typography, Link } from '@mui/material';
 
-const LobbyDetails = ({ lobbyId, lobbyName, lobbyUrl }) => {
+import useWebex from '../hooks/useWebex';
+
+const LobbyDetails = ({ lobbyId, lobbyName, lobbyUrl, onSetShare }) => {
+  const { webexData } = useWebex();
+
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
@@ -18,6 +22,14 @@ const LobbyDetails = ({ lobbyId, lobbyName, lobbyUrl }) => {
             {lobbyUrl}
           </Link>
         </Typography>
+        <Button
+          variant="contained"
+          disabled={!webexData}
+          onClick={onSetShare}
+          sx={{ mt: 2 }}
+        >
+          Share Lobby in Webex
+        </Button>
       </CardContent>
     </Card>
   );
@@ -28,6 +40,7 @@ LobbyDetails.propTypes = {
   lobbyId: PropTypes.string.isRequired,
   lobbyName: PropTypes.string.isRequired,
   lobbyUrl: PropTypes.string.isRequired,
+  onSetShare: PropTypes.func.isRequired,
 };
 
 export default LobbyDetails;

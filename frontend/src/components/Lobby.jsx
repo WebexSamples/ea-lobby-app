@@ -53,6 +53,16 @@ const Lobby = () => {
     joinLobby(userObj);
   };
 
+  const handleSetShareURL = async () => {
+    if (webexData) {
+      try {
+        await webexData.app.setShareUrl(lobbyUrl, lobbyUrl, 'Lobby');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   if (loading)
     return <Typography textAlign="center">Loading lobby...</Typography>;
 
@@ -68,6 +78,7 @@ const Lobby = () => {
         lobbyId={lobbyId}
         lobbyName={lobby.lobby_name}
         lobbyUrl={lobbyUrl}
+        onSetShare={handleSetShareURL}
       />
 
       {/* Participants List */}
