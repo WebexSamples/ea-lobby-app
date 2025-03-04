@@ -1,27 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import useWebex from '../hooks/useWebex';
 import useLobby from '../hooks/useLobby';
 import LobbyDetails from './LobbyDetails';
 import LobbyParticipants from './LobbyParticipants';
 import LobbyActions from './LobbyActions';
+import JoinLobby from './JoinLobby';
 import { Typography, Box } from '@mui/material';
 
 const Lobby = () => {
   const { lobbyId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const { webexData } = useWebex();
 
-  // Load user from localStorage or generate a guest user
+  // Load user from localStorage or default to Webex user
   const storedUser = JSON.parse(localStorage.getItem(`lobbyUser-${lobbyId}`));
-  const [user, setUser] = useState(
-    storedUser ||
-      location.state?.user || {
-        id: uuidv4(),
-        display_name: `Guest-${Math.floor(Math.random() * 1000)}`,
-      },
-  );
+  const [user, setUser] = useState(storedUser || location.state?.user || null);
 
   const {
     lobby,
@@ -33,26 +28,48 @@ const Lobby = () => {
     updateDisplayName,
     lobbyUrl,
   } = useLobby(lobbyId, user);
+
   const [newDisplayName, setNewDisplayName] = useState('');
 
+  // Create a new user object from Webex data
   useEffect(() => {
-    if (webexData) {
-      setUser((prevUser) => ({
-        ...prevUser,
-        display_name: webexData.user.displayName,
-      }));
+    if (webexData && !user) {
+      setUser({
+        id: webexData.user.id,
+        display_name: webexData.user.displayName || 'Guest',
+      });
     }
-  }, [webexData]);
+  }, [webexData, user]);
 
   useEffect(() => {
-    // Auto-rejoin if user was previously in the lobby
-    if (!joined && user) {
-      joinLobby(user.display_name);
+    if (!joined && user?.id) {
+      joinLobby(user);
     }
   }, [joined, user, joinLobby]);
 
+  // Handle Join Lobby action by setting user and joining the lobby
+  const handleJoinLobby = (userObj) => {
+    setUser(userObj);
+    joinLobby(userObj);
+  };
+
+  const handleSetShareURL = async () => {
+    if (webexData) {
+      try {
+        await webexData.app.setShareUrl(lobbyUrl, lobbyUrl, 'Lobby');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
   if (loading)
     return <Typography textAlign="center">Loading lobby...</Typography>;
+
+  // Show Join Lobby screen for new users
+  if (!joined) {
+    return <JoinLobby onJoin={handleJoinLobby} />;
+  }
 
   return (
     <Box sx={{ mt: 4, mx: 'auto', maxWidth: 600 }}>
@@ -61,21 +78,25 @@ const Lobby = () => {
         lobbyId={lobbyId}
         lobbyName={lobby.lobby_name}
         lobbyUrl={lobbyUrl}
+        onSetShare={handleSetShareURL}
       />
 
-      {/* Participants Table */}
+      {/* Participants List */}
       <LobbyParticipants
         participants={lobby.participants}
         currentUser={user}
         toggleReady={toggleReady}
       />
 
-      {/* Participant Actions */}
+      {/* User Actions */}
       <LobbyActions
         newDisplayName={newDisplayName}
         setNewDisplayName={setNewDisplayName}
         updateDisplayName={updateDisplayName}
-        leaveLobby={leaveLobby}
+        leaveLobby={() => {
+          leaveLobby();
+          navigate('/lobby'); // Ensure user is redirected after leaving
+        }}
       />
     </Box>
   );
