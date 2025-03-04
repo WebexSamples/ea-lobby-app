@@ -31,6 +31,8 @@ const useWebex = () => {
         const timeout = setTimeout(() => {
           setIsRunningInWebex(false);
           setLoading(false);
+          setUsername('Unknown User');
+          setMeetingName('No Active Meeting');
         }, 5000); // 5-second timeout
 
         await app.onReady(); // Will not complete if outside Webex

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   TextField,
@@ -17,15 +17,16 @@ const CreateLobby = () => {
   const [lobbyName, setLobbyName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { isConnected, username, meetingName } = useWebex();
+  const { isLoading, username, meetingName } = useWebex();
 
-  // Set default values from Webex SDK
-  useState(() => {
-    if (isConnected) {
+  // Once isLoading is false, set default values from Webex SDK
+  // This is a workaround to avoid setting default values before Webex SDK is ready
+  useEffect(() => {
+    if (!isLoading) {
       setLobbyName(meetingName);
       setDisplayName(username);
     }
-  }, [isConnected, username, meetingName]);
+  }, [isLoading, meetingName, username]);
 
   const handleCreateLobby = async () => {
     if (!lobbyName.trim() || !displayName.trim()) return;
