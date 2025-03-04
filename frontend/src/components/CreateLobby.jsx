@@ -17,15 +17,15 @@ const CreateLobby = () => {
   const [lobbyName, setLobbyName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { webexData } = useWebex();
+  const { isConnected, username, meetingName } = useWebex();
 
   // Set default values from Webex SDK
   useState(() => {
-    if (webexData) {
-      setLobbyName(webexData.meeting.title);
-      setDisplayName(webexData.user.displayName);
+    if (isConnected) {
+      setLobbyName(meetingName);
+      setDisplayName(username);
     }
-  }, [webexData]);
+  }, [isConnected, username, meetingName]);
 
   const handleCreateLobby = async () => {
     if (!lobbyName.trim() || !displayName.trim()) return;
