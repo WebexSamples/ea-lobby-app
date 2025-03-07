@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, CardContent, Typography, Link } from '@mui/material';
-
+import { Card, CardContent, Typography, Link, Button } from '@mui/material';
 import useWebex from '../hooks/useWebex';
 
-const LobbyDetails = ({ lobbyId, lobbyName, lobbyUrl, onSetShare }) => {
-  const { webexData } = useWebex();
+const LobbyDetails = ({ lobbyId, lobbyName, lobbyUrl }) => {
+  const { isShared, isRunningInWebex, toggleShare } = useWebex();
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -22,25 +21,42 @@ const LobbyDetails = ({ lobbyId, lobbyName, lobbyUrl, onSetShare }) => {
             {lobbyUrl}
           </Link>
         </Typography>
+
+        {/* Share Status */}
+        <Typography variant="body1" sx={{ mt: 2 }}>
+          <strong>Lobby Sharing:</strong>{' '}
+          {isShared ? 'Active ✅' : 'Inactive ❌'}
+        </Typography>
+
+        {/* Toggle Share Button */}
         <Button
           variant="contained"
-          disabled={!webexData}
-          onClick={onSetShare}
+          color={isShared ? 'error' : 'primary'}
           sx={{ mt: 2 }}
+          onClick={() => toggleShare(lobbyUrl)}
+          disabled={!isRunningInWebex} // Disable if not in Webex
         >
-          Share Lobby in Webex
+          {isShared ? 'Deactivate Shared Lobby' : 'Activate Shared Lobby'}
         </Button>
+
+        {!isRunningInWebex && (
+          <Typography
+            variant="caption"
+            color="error"
+            sx={{ display: 'block', mt: 1 }}
+          >
+            Sharing is only available inside Webex.
+          </Typography>
+        )}
       </CardContent>
     </Card>
   );
 };
 
-// ✅ Define PropTypes for Type Safety
 LobbyDetails.propTypes = {
   lobbyId: PropTypes.string.isRequired,
   lobbyName: PropTypes.string.isRequired,
   lobbyUrl: PropTypes.string.isRequired,
-  onSetShare: PropTypes.func.isRequired,
 };
 
 export default LobbyDetails;
