@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import {
   CssBaseline,
@@ -11,10 +11,17 @@ import Lobby from './components/Lobby';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
 import BreadcrumbsNav from './components/BreadcrumbsNav';
+import useWebex from './hooks/useWebex';
 import { ROUTES } from './constants';
 
 function App() {
+  const { theme: webexTheme } = useWebex();
   const [darkMode, setDarkMode] = useState(false);
+
+  // Sync theme when Webex environment is detected
+  useEffect(() => {
+    setDarkMode(webexTheme === 'dark');
+  }, [webexTheme]);
 
   const theme = createTheme({
     palette: {

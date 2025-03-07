@@ -13,6 +13,7 @@ import Application from '@webex/embedded-app-sdk';
  * @property {boolean} isShared - Whether the lobby is currently shared.
  * @property {string|null} username - Webex user's display name.
  * @property {string|null} meetingName - The current Webex meeting name.
+ * @property {string} theme - Current Webex theme (light/dark).
  * @property {Function} toggleShare - Function to activate/deactivate lobby sharing.
  */
 const useWebex = () => {
@@ -24,6 +25,7 @@ const useWebex = () => {
   const [isShared, setIsShared] = useState(false);
   const [username, setUsername] = useState(null);
   const [meetingName, setMeetingName] = useState(null);
+  const [theme, setTheme] = useState('light'); // Default to light theme
 
   useEffect(() => {
     const initializeWebex = async () => {
@@ -36,6 +38,7 @@ const useWebex = () => {
           setLoading(false);
           setUsername('Unknown User');
           setMeetingName('No Active Meeting');
+          setTheme('light'); // Default theme
         }, 5000);
 
         await app.onReady(); // Completes only if inside Webex
@@ -53,6 +56,15 @@ const useWebex = () => {
         // Fetch initial share state
         const sharedState = app.isShared;
         setIsShared(sharedState);
+
+        // Fetch initial theme
+        const webexTheme = app.application.states.theme || 'light';
+        setTheme(webexTheme.toLowerCase());
+
+        // Listen for theme changes
+        app.on('application:themeChanged', (data) => {
+          setTheme(data.toLowerCase());
+        });
 
         // Listen for share state changes
         app.on('application:shareStateChanged', (shareState) => {
@@ -101,6 +113,7 @@ const useWebex = () => {
     isShared,
     username,
     meetingName,
+    theme,
     toggleShare,
   };
 };
