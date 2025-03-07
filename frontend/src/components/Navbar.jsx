@@ -62,54 +62,58 @@ const Navbar = ({ darkMode, setDarkMode }) => {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          {/* Webex Status */}
-          <MenuItem disabled>
-            {loading ? (
-              <CircularProgress size={18} />
-            ) : isConnected ? (
-              <>
-                <OnlineIcon color="success" sx={{ mr: 1 }} /> Connected to Webex
-              </>
-            ) : (
-              <>
-                <OfflineIcon color="error" sx={{ mr: 1 }} /> Webex Not Connected
-              </>
-            )}
-          </MenuItem>
+          {[
+            // Webex Status
+            <MenuItem key="status" disabled>
+              {loading ? (
+                <CircularProgress size={18} />
+              ) : isConnected ? (
+                <>
+                  <OnlineIcon color="success" sx={{ mr: 1 }} /> Connected to
+                  Webex
+                </>
+              ) : (
+                <>
+                  <OfflineIcon color="error" sx={{ mr: 1 }} /> Webex Not
+                  Connected
+                </>
+              )}
+            </MenuItem>,
 
-          {/* Webex Running Environment */}
-          {!isRunningInWebex && (
-            <>
-              <Divider />
-              <MenuItem disabled>
-                <WarningIcon color="warning" sx={{ mr: 1 }} /> Running Outside
-                Webex
-              </MenuItem>
-            </>
-          )}
+            // Webex Running Environment
+            !isRunningInWebex &&
+              ((<Divider key="divider-outside-webex" />),
+              (
+                <MenuItem key="outside-webex" disabled>
+                  <WarningIcon color="warning" sx={{ mr: 1 }} /> Running Outside
+                  Webex
+                </MenuItem>
+              )),
 
-          {/* Webex User Info (Only Show If Inside Webex) */}
-          {isRunningInWebex && (
-            <>
-              <Divider />
-              <MenuItem disabled>
-                <UserIcon sx={{ mr: 1 }} /> {username}
-              </MenuItem>
+            // Webex User Info (Only Show If Inside Webex)
+            isRunningInWebex &&
+              ((<Divider key="divider-user-info" />),
+              (
+                <MenuItem key="username" disabled>
+                  <UserIcon sx={{ mr: 1 }} /> {username}
+                </MenuItem>
+              ),
+              (
+                <MenuItem key="meeting-name" disabled>
+                  <MeetingIcon sx={{ mr: 1 }} /> {meetingName}
+                </MenuItem>
+              )),
 
-              {/* Meeting Name */}
-              <MenuItem disabled>
-                <MeetingIcon sx={{ mr: 1 }} /> {meetingName}
-              </MenuItem>
-            </>
-          )}
-
-          {/* Show Error if Connection Fails */}
-          {error && (
-            <>
-              <Divider />
-              <MenuItem disabled>Error: {error}</MenuItem>
-            </>
-          )}
+            // Show Error if Connection Fails
+            error &&
+              ((<Divider key="divider-error" />),
+              (
+                <MenuItem key="error" disabled>
+                  Error: {error}
+                </MenuItem>
+              )),
+          ].filter(Boolean)}{' '}
+          {/* Filter out falsy values like `false` */}
         </Menu>
       </Toolbar>
     </AppBar>

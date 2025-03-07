@@ -36,8 +36,8 @@ const LobbyActions = ({
       <Card sx={{ mt: 3 }}>
         <CardContent>
           <Typography variant="h6">Your Actions</Typography>
-          <Grid2 container spacing={2} sx={{ mt: 1 }} alignItems="center">
-            <Grid2 xs={8}>
+          <Grid2 container spacing={2} columns={12} sx={{ mt: 1 }}>
+            <Grid2 sx={{ gridColumn: 'span 8' }}>
               <TextField
                 fullWidth
                 label="New Display Name"
@@ -46,7 +46,7 @@ const LobbyActions = ({
                 onChange={(e) => setNewDisplayName(e.target.value)}
               />
             </Grid2>
-            <Grid2 xs={4}>
+            <Grid2 sx={{ gridColumn: 'span 4' }}>
               <Button
                 fullWidth
                 variant="contained"
@@ -56,7 +56,7 @@ const LobbyActions = ({
                 Update Name
               </Button>
             </Grid2>
-            <Grid2 xs={12} sx={{ mt: 2 }}>
+            <Grid2 sx={{ gridColumn: 'span 12', mt: 2 }}>
               <Button
                 fullWidth
                 variant="outlined"
